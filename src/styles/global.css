@@ -9,5 +9,6 @@ body {
 
 body,
 button {
-  font: 400 1rem "Prompt", sans-serif;
+  @apply text-sm font-normal md:text-base;
+  font-family: "Prompt", sans-serif;
 }

@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import axios from "axios";
 
 import logo from "./assets/logo.svg";
-import { BookMarked, Building2, MapPin, Users } from "lucide-react";
+import { BookMarked, Building2, Download, MapPin, Users } from "lucide-react";
 import { useState } from "react";
 
 interface UserData {
@@ -16,7 +16,7 @@ interface UserData {
 }
 
 export function App() {
-  const [changeColor, setChangeColor] = useState();
+  const [changeColor, setChangeColor] = useState("");
 
   const { data } = useQuery<UserData>(
     "userData",
@@ -32,21 +32,29 @@ export function App() {
     }
   );
 
-  function randomColor() {
-    let R = Math.floor(Math.random() * 255);
-    let G = Math.floor(Math.random() * 255);
-    let B = Math.floor(Math.random() * 255);
+  function handleRandomColor() {
+    const randomColor = "#" + Math.random().toString(16).slice(2, 8);
+
+    setChangeColor(randomColor);
   }
 
   return (
-    <main className="w-screen h-screen max-w-4xl mx-auto flex items-center justify-between">
-      <div className="w-[438px] h-[693px] px-4 py-6 rounded-[50px] bg-zinc-700">
+    <main className="px-2 w-screen h-screen max-w-4xl mx-auto flex items-center justify-between">
+      <div
+        style={{ background: `${changeColor}` }}
+        className="w-[438px] h-[693px] px-4 py-6 rounded-[50px]"
+      >
         <div className="h-full bg-zinc-900 rounded-[50px] px-2 py-2 relative overflow-hidden">
-          <header className="flex items-center pl-6 pt-6 gap-5">
-            <div className="w-14 h-14 border border-white rounded-full flex items-center justify-center gap-5">
-              <img src={logo} alt="logo" width={30} />
+          <header className="flex items-center justify-between px-6 pt-6 gap-5">
+            <div className="flex items-center gap-5">
+              <div className="w-12 h-12 md:w-14 md:h-14 border border-white rounded-full flex items-center justify-center gap-5">
+                <img src={logo} alt="logo" className="w-6 md:w-[30px]" />
+              </div>
+              <h3 className="text-xl md:text-2xl">{data?.name}</h3>
             </div>
-            <h3 className="text-2xl">{data?.name}</h3>
+            <a href="">
+              <Download size={20} color="white" />
+            </a>
           </header>
 
           <img
@@ -59,17 +67,17 @@ export function App() {
           <div className="absolute ml-3 -mt-40 space-y-1 py-8 pl-5 w-48 h-48 rounded-[50px] bg-gradient-to-t from-zinc-800/70 via-zinc-600/40 to-zinc-900">
             <div className="flex items-center gap-2">
               <Users size={20} />
-              <span>{`${data?.followers} Seguidores`}</span>
+              <span>{`${data?.followers} Followers`}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <Users size={20} />
-              <span>{`${data?.following} Seguindo`}</span>
+              <span>{`${data?.following} Following`}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <BookMarked size={20} />
-              <span>{`${data?.public_repos} Repositórios`}</span>
+              <span>{`${data?.public_repos} Repositories`}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -83,12 +91,19 @@ export function App() {
             </div>
           </div>
 
-          <div className="max-w-[250px] mx-auto">
+          <div className="flex flex-col gap-2 max-w-[200px] mx-auto">
             <button
-              onClick={randomColor}
-              className="md:hidden w-full mt-14 px-8 py-4 bg-zinc-700 hover:bg-zinc-800 transition-all rounded-2xl"
+              onClick={handleRandomColor}
+              className="md:hidden w-full mt-12 py-2 bg-zinc-700 hover:bg-zinc-800 transition-all rounded-xl"
             >
-              Gerar background
+              Generate background
+            </button>
+
+            <button
+              onClick={() => navigator.clipboard.writeText(changeColor)}
+              className="md:hidden w-full py-2 bg-zinc-700 hover:bg-zinc-800 transition-all rounded-xl"
+            >
+              Copy color
             </button>
           </div>
 
@@ -100,13 +115,22 @@ export function App() {
       </div>
 
       <div className="hidden md:flex flex-col items-center gap-8">
-        <p className="text-xl">Customizar Rocketcard</p>
-        <button
-          onClick={randomColor}
-          className="bg-zinc-700 hover:bg-zinc-800 transition-all py-4 px-12 rounded-2xl"
-        >
-          Gerar background
-        </button>
+        <p className="text-xl">Customize Rocketcard</p>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={handleRandomColor}
+            className="bg-zinc-700 hover:bg-zinc-800 transition-all py-2 px-6 rounded-xl"
+          >
+            Generate background
+          </button>
+
+          <button
+            onClick={() => navigator.clipboard.writeText(changeColor)}
+            className="bg-zinc-700 hover:bg-zinc-800 transition-all py-2 px-6 rounded-xl"
+          >
+            Copy color
+          </button>
+        </div>
       </div>
     </main>
   );
