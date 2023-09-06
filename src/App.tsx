@@ -1,9 +1,11 @@
 import { useQuery } from "react-query";
 import axios from "axios";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 import logo from "./assets/logo.svg";
 import { BookMarked, Building2, Download, MapPin, Users } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface UserData {
   avatar_url: string;
@@ -16,7 +18,8 @@ interface UserData {
 }
 
 export function App() {
-  const [changeColor, setChangeColor] = useState("");
+  const [changeColor, setChangeColor] = useState("#27272a");
+  const pdfRef = useRef();
 
   const { data } = useQuery<UserData>(
     "userData",
@@ -38,9 +41,34 @@ export function App() {
     setChangeColor(randomColor);
   }
 
+  function handleDownloadPDF() {
+    const input = pdfRef.current;
+    html2canvas(input).then((canvas) => {
+      const imageData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4", true);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imageWidth = canvas.width;
+      const imageHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imageWidth, pdfHeight / imageHeight);
+      const imageX = (pdfWidth - imageWidth * ratio) / 2;
+      const imageY = 30;
+      pdf.addImage(
+        imageData,
+        "PNG",
+        imageX,
+        imageY,
+        imageWidth * ratio,
+        imageHeight * ratio
+      );
+      pdf.save("invoice.pdf");
+    });
+  }
+
   return (
     <main className="px-2 w-screen h-screen max-w-4xl mx-auto flex items-center justify-between">
       <div
+        ref={pdfRef}
         style={{ background: `${changeColor}` }}
         className="w-[438px] h-[693px] px-4 py-6 rounded-[50px]"
       >
@@ -52,9 +80,12 @@ export function App() {
               </div>
               <h3 className="text-xl md:text-2xl">{data?.name}</h3>
             </div>
-            <a href="">
+            <button
+              onClick={handleDownloadPDF}
+              className="bg-zinc-800 rounded-full p-2"
+            >
               <Download size={20} color="white" />
-            </a>
+            </button>
           </header>
 
           <img
