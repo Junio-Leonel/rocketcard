@@ -1,11 +1,12 @@
+import { useRef, useState } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-import logo from "./assets/logo.svg";
 import { BookMarked, Building2, Download, MapPin, Users } from "lucide-react";
-import { useRef, useState } from "react";
+
+import logo from "./assets/logo.svg";
 
 interface UserData {
   avatar_url: string;
@@ -52,7 +53,7 @@ export function App() {
       const imageHeight = canvas.height;
       const ratio = Math.min(pdfWidth / imageWidth, pdfHeight / imageHeight);
       const imageX = (pdfWidth - imageWidth * ratio) / 2;
-      const imageY = 30;
+      const imageY = 0;
       pdf.addImage(
         imageData,
         "PNG",
@@ -61,7 +62,7 @@ export function App() {
         imageWidth * ratio,
         imageHeight * ratio
       );
-      pdf.save("invoice.pdf");
+      pdf.save("card.pdf");
     });
   }
 
@@ -82,7 +83,7 @@ export function App() {
             </div>
             <button
               onClick={handleDownloadPDF}
-              className="bg-zinc-800 rounded-full p-2"
+              className="bg-zinc-700 hover:bg-zinc-800 rounded-full p-2 duration-300"
             >
               <Download size={20} color="white" />
             </button>
@@ -125,14 +126,14 @@ export function App() {
           <div className="flex flex-col gap-2 max-w-[200px] mx-auto">
             <button
               onClick={handleRandomColor}
-              className="md:hidden w-full mt-12 py-2 bg-zinc-700 hover:bg-zinc-800 transition-all rounded-xl"
+              className="md:hidden w-full mt-12 py-2 bg-zinc-700 hover:bg-zinc-800 duration-300 rounded-xl"
             >
               Generate background
             </button>
 
             <button
               onClick={() => navigator.clipboard.writeText(changeColor)}
-              className="md:hidden w-full py-2 bg-zinc-700 hover:bg-zinc-800 transition-all rounded-xl"
+              className="md:hidden w-full py-2 bg-zinc-700 hover:bg-zinc-800 duration-300 rounded-xl"
             >
               Copy color
             </button>
@@ -150,14 +151,14 @@ export function App() {
         <div className="flex flex-col gap-2">
           <button
             onClick={handleRandomColor}
-            className="bg-zinc-700 hover:bg-zinc-800 transition-all py-2 px-6 rounded-xl"
+            className="bg-zinc-700 hover:bg-zinc-800 duration-300 py-2 px-6 rounded-xl"
           >
             Generate background
           </button>
 
           <button
             onClick={() => navigator.clipboard.writeText(changeColor)}
-            className="bg-zinc-700 hover:bg-zinc-800 transition-all py-2 px-6 rounded-xl"
+            className="bg-zinc-700 hover:bg-zinc-800 duration-300 py-2 px-6 rounded-xl"
           >
             Copy color
           </button>
