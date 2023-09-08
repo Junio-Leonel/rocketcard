@@ -4,9 +4,11 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-import { BookMarked, Building2, Download, MapPin, Users } from "lucide-react";
+import { Download } from "lucide-react";
 
 import logo from "./assets/logo.svg";
+import { generateRandomColor } from "./utils/colors";
+import { UserInformation } from "./components/UserInformation";
 
 interface UserData {
   avatar_url: string;
@@ -19,14 +21,14 @@ interface UserData {
 }
 
 export function App() {
-  const [changeColor, setChangeColor] = useState("#27272a");
-  const pdfRef = useRef();
+  const [currentColor, setCurrentColor] = useState(generateRandomColor());
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   const { data } = useQuery<UserData>(
     "userData",
     async () => {
       const response = await axios.get(
-        "https://api.github.com/users/Junio-Leonel"
+        "https://api.github.com/users/vitorleonel"
       );
 
       return response.data;
@@ -37,16 +39,24 @@ export function App() {
   );
 
   function handleRandomColor() {
-    const randomColor = "#" + Math.random().toString(16).slice(2, 8);
-
-    setChangeColor(randomColor);
+    setCurrentColor(generateRandomColor());
   }
 
   function handleDownloadPDF() {
     const input = pdfRef.current;
-    html2canvas(input).then((canvas) => {
+
+    if (!input) {
+      window.alert("Não foi possivel baixar a imagem!");
+
+      return;
+    }
+
+    html2canvas(input, { useCORS: true }).then((canvas) => {
       const imageData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4", true);
+
+      console.log(imageData);
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "px" });
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imageWidth = canvas.width;
@@ -70,7 +80,7 @@ export function App() {
     <main className="px-2 w-screen h-screen max-w-4xl mx-auto flex items-center justify-between">
       <div
         ref={pdfRef}
-        style={{ background: `${changeColor}` }}
+        style={{ background: `${currentColor}` }}
         className="w-[438px] h-[693px] px-4 py-6 rounded-[50px]"
       >
         <div className="h-full bg-zinc-900 rounded-[50px] px-2 py-2 relative overflow-hidden">
@@ -97,30 +107,24 @@ export function App() {
           />
 
           <div className="absolute ml-3 -mt-40 space-y-1 py-8 pl-5 w-48 h-48 rounded-[50px] bg-gradient-to-t from-zinc-800/70 via-zinc-600/40 to-zinc-900">
-            <div className="flex items-center gap-2">
-              <Users size={20} />
-              <span>{`${data?.followers} Followers`}</span>
-            </div>
+            <UserInformation
+              icon="Users"
+              text={`${data?.followers} Followers`}
+            />
 
-            <div className="flex items-center gap-2">
-              <Users size={20} />
-              <span>{`${data?.following} Following`}</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <BookMarked size={20} />
-              <span>{`${data?.public_repos} Repositories`}</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Building2 size={20} />
-              <span>{data?.company}</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <MapPin size={20} />
-              <span>{data?.location}</span>
-            </div>
+            <UserInformation
+              icon="Users"
+              text={`${data?.following} Following`}
+            />
+            <UserInformation
+              icon="BookMarked"
+              text={`${data?.public_repos} Repositories`}
+            />
+            <UserInformation
+              icon="Building2"
+              text={`${data?.company || "N/A"}`}
+            />
+            <UserInformation icon="MapPin" text={`${data?.location}`} />
           </div>
 
           <div className="flex flex-col gap-2 max-w-[200px] mx-auto">
@@ -132,7 +136,7 @@ export function App() {
             </button>
 
             <button
-              onClick={() => navigator.clipboard.writeText(changeColor)}
+              onClick={() => navigator.clipboard.writeText(currentColor)}
               className="md:hidden w-full py-2 bg-zinc-700 hover:bg-zinc-800 duration-300 rounded-xl"
             >
               Copy color
@@ -157,7 +161,7 @@ export function App() {
           </button>
 
           <button
-            onClick={() => navigator.clipboard.writeText(changeColor)}
+            onClick={() => navigator.clipboard.writeText(currentColor)}
             className="bg-zinc-700 hover:bg-zinc-800 duration-300 py-2 px-6 rounded-xl"
           >
             Copy color
